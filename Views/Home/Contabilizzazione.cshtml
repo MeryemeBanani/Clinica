@@ -1,0 +1,74 @@
+﻿@{
+    ViewBag.Title = "Ricoveri Attivi";
+}
+
+<h2>Ricoveri animali randagi</h2>
+
+
+<button id="CaricaRicoveri" class="btn btn-primary">Mostra i ricoveri </button>
+
+
+<table id="tabellaRicoveri" class="table">
+    <thead>
+        <tr>
+            <th>ID Ricovero</th>
+            <th>Nome Animale</th>
+            <th>Id Animale</th>
+            <th>Data Visita</th>
+            <th>Tipo Visita</th>
+            <th>Stato Ricovero</th>
+        </tr>
+    </thead>
+    <tbody>
+       
+    </tbody>
+</table>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        
+        $("#CaricaRicoveri").click(function () {
+            $.ajax({
+                url: '@Url.Action("GetRicoveriAttivi", "Home")', 
+                type: 'GET',
+                success: function (data) {
+                    
+                    $('#tabellaRicoveri tbody').empty();
+
+                   
+                    if (data.length > 0) {
+                       
+                        data.forEach(function (ricovero) {
+                            $('#tabellaRicoveri tbody').append(`
+                                <tr>
+                                    <td>${ricovero.ID}</td>
+                                    <td>${ricovero.NomeAnimale}</td>
+                                    <td>${ricovero.AnimaleID}</td>
+                                    <td>${ricovero.DataVisita}</td>
+                                    <td>${ricovero.TipoVisita}</td>
+                                    <td>${ricovero.Necessita_Ricovero ? 'Sì' : 'No'}</td>
+                                </tr>
+                            `);
+                        });
+                    } else {
+                        
+                        $('#tabellaRicoveri tbody').append(`
+                            <tr>
+                                <td colspan="5" class="text-center">Nessun ricovero attivo trovato</td>
+                            </tr>
+                        `);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("Si è verificato un errore durante il caricamento dei ricoveri attivi.");
+                }
+            });
+        });
+    });
+</script>
+
+
+

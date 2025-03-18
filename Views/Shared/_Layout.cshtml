@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Clinica</title>
+
+    
+    <link href="~/Content/bootstrap.css" rel="stylesheet" type="text/css" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aI8w5t7xfk5zz9LAmI+V17z6l3JtI4wKHf7g2h6G60eM26dJ7edQh7VR9u8B2kS" crossorigin="anonymous" />
+
+   
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy/tPpPyggH4CdLM3l7z6gsaa52R2tnv7h3O4v5y" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-6g23GbJeC04DxPv88vL0bQczARax3zcPkp6so0Akw6v0khR4sGRRjl7/miwvN7Jf" crossorigin="anonymous"></script>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <!-- CSS personalizzato -->
+    <style>
+       
+        .navbar {
+            background-color: #ADD8E6; 
+        }
+
+       
+        .navbar-brand {
+            font-style: italic;
+            color: #1E3A8A; /* Blu scuro */
+        }
+
+        .nav-link {
+            color: #FFFFFF; /* Azzurro chiaro */
+            font-weight: bold;
+        }
+
+        .navbar-brand:hover {
+            color: #1E3A8A; /* Blu scuro al passaggio del mouse */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark">
+        <div class="container">
+            @Html.ActionLink("Clinica Moretti - Veterinario per Animali Domestici", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Attiva/Disattiva spostamento" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+
+
+
+                        <li>@Html.ActionLink("Contabilizzazione", "Contabilizzazione", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+
+                        if (User.IsInRole("Admin"))
+                        {
+                            <li>@Html.ActionLink("API", "API", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                        }
+                    }
+
+                </ul>
+
+                @if (User.Identity.IsAuthenticated) { 
+
+                    <ul class="navbar-nav ml-auto">
+                        <li style="display: flex; align-items: center;">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <img src="~/Content/imgUpload/Admin.jpeg" alt="Admin" style="width: 30px; height: 30px; vertical-align: middle; margin-left: 5px;" />
+                            }
+                            else if (User.IsInRole("Veterinario"))
+                            {
+                                <img src="~/Content/imgUpload/Doctor.jpeg" alt="Veterinario" style="width: 30px; height: 30px; vertical-align: middle; margin-left: 5px;" />
+                            }
+                            @Html.ActionLink("Logout", "Logout", "Home", new { area = "" }, new { @class = "nav-link logout-link" })
+
+                        </li>
+                    </ul>
+
+
+                }
+            </div>
+        </div>
+    </nav>
+    <div class="container body-content">
+        @RenderBody()
+        
+        <footer>
+            
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+

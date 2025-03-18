@@ -1,0 +1,42 @@
+﻿@model Clinica.Models.Visita
+
+@{
+    ViewBag.Title = "Aggiungi Nuova Visita";
+}
+
+
+@using (Html.BeginForm("AddVisita", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="form-group">
+        <label for="Nome">Nome Animale</label>
+        @Html.TextBoxFor(m => m.Nome, new { @class = "form-control", placeholder = "Nome Animale" })
+        @Html.ValidationMessageFor(m => m.Nome)
+    </div>
+
+    <div class="form-group">
+        <label for="Tipologia">Tipologia</label>
+        @Html.TextBoxFor(m => m.Tipologia, new { @class = "form-control", placeholder = "Tipologia" })
+        @Html.ValidationMessageFor(m => m.Tipologia)
+    </div>
+
+    <div class="form-group">
+        <label for="Colore">Colore</label>
+        @Html.TextBoxFor(m => m.Colore, new { @class = "form-control", placeholder = "Colore" })
+        @Html.ValidationMessageFor(m => m.Colore)
+    </div>
+
+    <div class="form-group">
+        <label for="DataNascita">Data di Nascita</label>
+        @Html.TextBoxFor(m => m.DataNascita, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.DataNascita)
+    </div>
+
+   
+
+    <div class="form-group">
+        <label for="file">Foto Animale</label>
+        <input type="file" name="file" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Salva Visita</button>
+}

@@ -1,0 +1,82 @@
+﻿@model Clinica.Models.Animale
+
+@{
+    ViewBag.Title = "Aggiungi Nuovo Animale";
+}
+
+<h2>Aggiungi nuovo animale</h2>
+
+@using (Html.BeginForm("RegistraAnimale", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+
+    <div class="form-group">
+        <div> @Html.LabelFor(model => model.Nome)</div>
+        @Html.TextBoxFor(model => model.Nome, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Nome)
+    </div>
+
+
+    <div class="form-group">
+        <div>Razza</div>
+        @Html.TextBoxFor(model => model.Tipologia, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Tipologia)
+    </div>
+
+    <div class="form-group">
+        <div>@Html.LabelFor(model => model.Colore)</div>
+        @Html.TextBoxFor(model => model.Colore, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Colore)
+    </div>
+
+
+    <div class="form-group">
+        <div>@Html.LabelFor(model => model.DataNascita)</div>
+        @Html.TextBoxFor(model => model.DataNascita, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(model => model.DataNascita)
+    </div>
+
+
+
+    <div class="form-group">
+        <div>@Html.LabelFor(model => model.MicroChip)</div>
+        @Html.CheckBoxFor(model => model.MicroChip, new { @class = "form-check-input" })
+        @Html.ValidationMessageFor(model => model.MicroChip)
+    </div>
+
+    <div class="form-group">
+        <div>@Html.LabelFor(model => model.ID)</div>
+        @Html.TextBoxFor(model => model.ID, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.ID)
+    </div>
+
+    <div class="form-group">
+        <div>@Html.LabelFor(model => model.Smarrito)</div>
+        @Html.CheckBoxFor(model => model.Smarrito, new { @class = "form-check-input" })
+        @Html.ValidationMessageFor(model => model.Smarrito)
+    </div>
+
+
+    <div class="form-group">
+        <div>Anagrafica Proprietario</div>
+        @Html.TextBoxFor(model => model.Anagrafica_Proprietario, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Anagrafica_Proprietario)
+    </div>
+
+
+    <div class="form-group">
+        <div>@Html.LabelFor(model => model.file)</div>
+        <input type="file" name="file" class="form-control" />
+        @Html.ValidationMessageFor(model => model.file)
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Salva</button>
+}
+
+
+@if (TempData["ErroreDB"] != null)
+{
+    @TempData["ErroreDB"]
+}

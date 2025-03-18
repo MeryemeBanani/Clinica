@@ -1,0 +1,118 @@
+﻿
+@{
+    ViewBag.Title = "MicroServizi API";
+}
+
+@{
+    ViewBag.Title = "Verifica Ricovero";
+}
+
+<div class="container" style="margin-top: 20px; border: 2px solid #00BFFF; padding: 20px; text-align: center; width: 80%; max-width: 600px; margin-left: auto; margin-right: auto; display: flex; flex-direction: column; align-items: center;">
+    <h2>Mostra visite in formato json da microchip:</h2>
+
+    <form id="microchipForm" style="width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center;">
+        <div class="form-group" style="width: 100%;">
+            <label for="microchip">Numero Microchip:</label>
+            <input type="text" id="microchip" name="microchip" class="form-control" required style="width: 100%; max-width: 350px;" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Visualizza</button>
+    </form>
+</div>
+
+<div id="result" style="margin-top: 20px; border: 2px solid #00BFFF; padding: 20px; text-align: center; width: 80%; max-width: 600px; margin-left: auto; margin-right: auto;">
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#microchipForm').submit(function (event) {
+            event.preventDefault();
+
+            var microchip = $('#microchip').val();
+
+
+
+            fetch(`/Home/ListaVisiteDaMicroChip?microchip=${encodeURIComponent(microchip)}`, {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Errore nella risposta del server.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.CiSonoVisite) {
+
+                        let resultText = JSON.stringify(data.Visite, null, 4);
+                        $('#result').text(resultText);
+                    } else {
+                        $('#result').text("Non ci sono visite per questo microchip.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Errore:", error);
+                    $('#result').text("Errore nella richiesta.");
+                });
+        });
+    });
+</script>
+
+
+<div class="container" style="margin-top: 20px; border: 2px solid #00BFFF; padding: 20px; text-align: center; width: 80%; max-width: 600px; margin-left: auto; margin-right: auto; display: flex; flex-direction: column; align-items: center;">
+    <h2>Mostra lista animali in formato JSON da Tipologia (razza):</h2>
+
+    <form id="tipologiaForm" style="width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center;">
+        <div class="form-group" style="width: 100%;">
+            <label for="tipologia">Tipologia:</label>
+            <input type="text" id="tipologia" name="tipologia" class="form-control" required style="width: 100%; max-width: 350px;" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Visualizza</button>
+    </form>
+</div>
+
+<div id="result2" style="margin-top: 20px; border: 2px solid #00BFFF; padding: 20px; text-align: center; width: 80%; max-width: 600px; margin-left: auto; margin-right: auto;">
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#tipologiaForm').submit(function (event) {
+            event.preventDefault();
+
+            // Recupera il valore corretto
+            var tipologia = $('#tipologia').val();
+
+            fetch(`/Home/ListaAnimaliDaTipologia?tipologia=${encodeURIComponent(tipologia)}`, {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Errore nella risposta del server.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.CiSonoAnimali) {
+                        // Mostra il risultato formattato come JSON
+                        let resultText = JSON.stringify(data.Animali, null, 4);
+                        $('#result2').text(resultText);
+                    } else {
+                        $('#result2').text("Non ci sono animali.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Errore:", error);
+                    $('#result2').text("Errore nella richiesta.");
+                });
+        });
+    });
+</script>
+

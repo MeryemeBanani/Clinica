@@ -1,0 +1,63 @@
+﻿
+
+@{
+    ViewBag.Title = "Cerca Animale";
+}
+
+<div class="container" style="margin-top: 20px; border: 2px solid #00BFFF; padding: 20px; text-align: center; width: 80%; max-width: 600px; margin-left: auto; margin-right: auto; display: flex; flex-direction: column; align-items: center;">
+    <h2>Vedi se il tuo animale è ricoverato qui da noi:</h2>
+
+    <form id="microchipForm" style="width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center;">
+        <div class="form-group" style="width: 100%;">
+            <label for="microchip">Numero Microchip:</label>
+            <input type="text" id="microchip" name="microchip" class="form-control" required style="width: 100%; max-width: 350px;" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Verifica</button>
+    </form>
+</div>
+
+<div id="result" style="margin-top: 20px; border: 2px solid #00BFFF; padding: 20px; text-align: center; width: 80%; max-width: 600px; margin-left: auto; margin-right: auto;">
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#microchipForm').submit(function (event) {
+            event.preventDefault(); // per evitare che la pagina venga ricaricata al submit
+
+            var microchip = $('#microchip').val(); // prendi il valore del microchip inserito
+
+            $.ajax({
+                url: '/Home/VerificaRicovero',  // URL dell'azione che hai creato
+                type: 'GET',
+                data: { microchip: microchip },  // invia il microchip come parametro
+
+                success: function (response) {
+                    if (response.isRicoverato) {
+                        // Crea il contenuto da visualizzare
+                        var resultHtml = '<h3>Dettagli dell\'Animale:</h3>';
+                        resultHtml += '<p><strong>AnimaleID:</strong> ' + response.AnimaleID + '</p>';
+                        resultHtml += '<p><strong>Nome:</strong> ' + response.Nome + '</p>';
+
+                        // Se esiste un file immagine, mostralo
+                        if (response.NomeFile) {
+                            resultHtml += '<p><img src="/Content/imgUpload/' + response.NomeFile + '" alt="Immagine Animale" style="max-width: 200px;" /></p>';
+                        }
+
+                        // Inserisci il contenuto nel div con id 'result'
+                        $('#result').html(resultHtml);
+
+                    } else {
+                        // Se l'animale non è ricoverato
+                        $('#result').html('<div class="alert alert-danger">L\'animale con microchip ' + microchip + ' non è ricoverato presso la nostra clinica.</div>');
+                    }
+                },
+                error: function () {
+                    $('#result').html('<div class="alert alert-danger">Si è verificato un errore durante la verifica.</div>');
+                }
+            });
+        });
+    });
+</script>
+

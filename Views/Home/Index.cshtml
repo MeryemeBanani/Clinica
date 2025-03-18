@@ -1,0 +1,88 @@
+﻿@model Clinica.Models.Animale
+
+@{
+    ViewBag.Title = "Benvenuto";
+}
+
+<div class="container" style="background-color: #e0f7fa; border-radius: 15px; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); ">
+
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h2 class="fst-italic">Benvenuto</h2>
+        </div>
+    </div>
+
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6">
+            @using (Html.BeginForm("Cronistoria", "Home", FormMethod.Post))
+            {
+                <div class="form-group">
+                    <label for="ID">Inserisci il codice del microchip dell'animale:</label>
+                    @Html.TextBoxFor(m => m.ID, new { @class = "form-control mb-3", name = "ID" })
+                    @Html.ValidationMessageFor(m => m.ID, "", new { @class = "text-danger" })
+                </div>
+
+
+                <button type="submit" class="btn btn-primary btn-block">Cronistoria Animale</button>
+            }
+        </div>
+    </div>
+
+
+    @if (TempData["Messaggio"] != null)
+    {
+        <div class="alert alert-danger mt-4">
+            @TempData["Messaggio"]
+        </div>
+    }
+
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6">
+            @using (Html.BeginForm("AggiungiVisita", "Home", FormMethod.Get))
+            {
+                <div class="form-group">
+                    <label for="ID">Inserisci il codice del microchip dell'animale:</label>
+                    @Html.TextBoxFor(m => m.ID, new { @class = "form-control mb-3", name = "ID" })
+                    @Html.ValidationMessageFor(m => m.ID, "", new { @class = "text-danger" })
+                </div>
+
+
+                <button type="submit" class="btn btn-primary btn-block">Aggiungi Visita</button>
+            }
+        </div>
+
+
+    </div>
+
+    @if (TempData["MessaggioAdd"] != null)
+    {
+        <div class="alert alert-danger mt-4">
+            @TempData["MessaggioAdd"]
+        </div>
+    }
+
+
+
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6 text-center">
+            <h3 class="fst-italic">Vuoi registrare un nuovo animale?</h3>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-3">
+        <div class="col-md-6">
+            @using (Html.BeginForm("RegistraAnimale", "Home", FormMethod.Get, new { enctype = "multipart/form-data" }))
+            {
+                <button type="submit" class="btn btn-primary btn-block">Registra nuovo animale</button>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+
+

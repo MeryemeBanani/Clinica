@@ -1,0 +1,127 @@
+﻿@model Clinica.Models.Utente
+
+@{
+    ViewBag.Title = "Login";
+}
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+
+    <style>
+        /* Remove default body margins */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Background image styling */
+        body {
+            background-image: url('@Url.Content("~/Content/imgUpload/Sfondo.jpg")');
+            background-size: cover; /* Cover the screen proportionally */
+            background-position: center; /* Center the background */
+            background-attachment: fixed; /* Make sure the background stays fixed while scrolling */
+            height: 100%; /* Ensures the image covers the entire viewport */
+            width: 100%; /* Ensures the image covers the entire viewport */
+        }
+
+        /* Content styling to prevent overlapping the header */
+        .content {
+            padding-top: 50px; /* Adds space from the top */
+        }
+
+        /* Style for the login box */
+        .login-box {
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+            border: 3px solid #00BFFF; /* Light blue border */
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 50px;
+        }
+
+        .btn-custom {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Content Section -->
+    <div class="content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="login-box">
+                        <h2>Login</h2>
+
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger">
+                                @TempData["ErrorMessage"]
+                            </div>
+                        }
+
+                        @using (Html.BeginForm("Login", "Home", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <div class="form-group">
+                                <label for="Email">Username:</label>
+                                @Html.TextBoxFor(x => x.UtenteID, new { @class = "form-control", @placeholder = "Enter your email" })
+                                @Html.ValidationMessageFor(x => x.UtenteID)
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Password">Password:</label>
+                                @Html.PasswordFor(x => x.Password, new { @class = "form-control", @placeholder = "Enter your password" })
+                                @Html.ValidationMessageFor(x => x.Password)
+                            </div>
+
+                           if (!User.Identity.IsAuthenticated)
+                            {
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-success">Login</button>
+                                </div>
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("Logout", "Home")" class="btn btn-danger btn-custom">Logout</a>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <a href="@Url.Action("CercaAnimale", "Home")" class="btn btn-primary btn-custom">Scopri se il tuo animale è da noi!</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for header scroll effect -->
+    <script>
+        var prevScrollPos = window.pageYOffset;
+
+        window.onscroll = function () {
+            var currentScrollPos = window.pageYOffset;
+            if (prevScrollPos > currentScrollPos) {
+                // Additional code can be added for any other effects
+            } else {
+                // Additional code for hiding/showing elements as needed
+            }
+            prevScrollPos = currentScrollPos;
+        }
+    </script>
+
+</body>
+</html>

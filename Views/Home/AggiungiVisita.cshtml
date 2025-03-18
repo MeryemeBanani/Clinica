@@ -1,0 +1,47 @@
+﻿@model Clinica.Models.Visita
+
+@{
+    ViewBag.Title = "Aggiungi Nuova Visita";
+}
+
+<h2>Aggiungi nuova visita per @Model.Nome</h2>
+
+@using (Html.BeginForm("AggiungiVisita", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(model => model.DataRegistrazione)
+    @Html.HiddenFor(model => model.AnimaleID)
+    @Html.HiddenFor(model => model.Animale)
+    @Html.HiddenFor(model => model.Nome)
+    @Html.HiddenFor(model => model.Tipologia)
+    @Html.HiddenFor(model => model.Colore)
+    @Html.HiddenFor(model => model.DataNascita)
+    @Html.HiddenFor(model => model.MicroChip)
+    @Html.HiddenFor(model => model.Animale.Smarrito)
+
+    <div class="form-group">
+        <div>@Html.LabelFor(model => model.DataVisita)</div>
+        @Html.TextBoxFor(model => model.DataVisita, "{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control", type = "datetime-local" })
+        @Html.ValidationMessageFor(model => model.DataVisita)
+    </div>
+
+    <div class="form-group">
+        <div>@Html.LabelFor(model => model.TipoVisita)</div>
+        @Html.TextBoxFor(model => model.TipoVisita,  new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.TipoVisita)
+    </div>
+
+    <div class="form-group">
+        <div>@Html.LabelFor(model => model.Necessita_Ricovero)</div>
+        @Html.CheckBoxFor(model => model.Necessita_Ricovero, new { @class = "form-check-input" })
+        @Html.ValidationMessageFor(model => model.Necessita_Ricovero)
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salva</button>
+}
+
+@if (TempData["ErroreDB"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErroreDB"]</div>
+}

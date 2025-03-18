@@ -1,0 +1,100 @@
+﻿@model IEnumerable<Clinica.Models.Visita>
+
+@{
+    ViewBag.Title = "Cronistoria";
+}
+
+<h2>Cronistoria delle Visite di @(Model.FirstOrDefault()?.Nome)</h2>
+
+<td style="width: 10px; display: flex; align-items: center;">
+
+    <img src="~/Content/imgUpload/@Model.FirstOrDefault().Animale.NameFile" alt="Foto" class="img-thumbnail" style="max-width: 100px; max-height: 100px;" />
+
+
+    @if (Model.FirstOrDefault()?.Animale.Smarrito == true)
+    {
+        <span class="badge bg-danger" style="margin-left: 10px; font-size: 0.8rem;">Randagio</span>
+    }
+</td>
+
+
+
+
+
+<table class="table">
+
+
+    <thead>
+        <tr>
+            <th>ID Visita</th>
+            <th>ID Animale</th>
+            <th>Data Registrazione</th>
+            <th>Nome Animale</th>
+            <th>Tipologia</th>
+            <th>Colore</th>
+            <th>Data Nascita</th>
+            <th>MicroChip</th>
+            <th>Data Visita</th>
+            <th>Stato Ricovero</th>
+            <th>Tipo Visita</th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var visita in Model)
+        {
+            <tr>
+                <td>@visita.ID</td>
+                <td>@visita.AnimaleID</td>
+                <td>@visita.DataRegistrazione.ToString("dd/MM/yyyy")</td>
+                <td>@visita.Nome
+                <td>@visita.Tipologia</td>
+                <td>@visita.Colore</td>
+                <td>@visita.DataNascita</td>
+                <td>@visita.MicroChip</td>
+                <td>@visita.DataVisita</td>
+                <td>
+                    <input type="checkbox" class="update-ricovero" data-id="@visita.ID"  @(visita.Necessita_Ricovero ? "checked" : "") />
+                </td>
+                <td>@visita.TipoVisita</td>
+
+
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<div class="text-center">
+    @Html.ActionLink("Aggiungi Visita", "AggiungiVisita", "Home", new { id = Model.FirstOrDefault()?.AnimaleID }, new { @class = "btn btn-info" })
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).on('change', '.update-ricovero', function () {
+        var visitaId = $(this).data('id');
+        var necessitaRicovero = $(this).is(':checked');
+
+        $.ajax({
+            url: '/Home/AggiornaRicovero',  //chiamo l'aggiornaRicovero che è un'azione in home
+            type: 'POST',
+            data: {
+                id: visitaId,  //gli passo i valori della visita e della necessitaRicovero
+                necessitaRicovero: necessitaRicovero
+            },
+            success: function () {
+                alert('Necessità ricovero aggiornata!'); 
+            },
+            error: function () {
+                alert('Errore durante l\'aggiornamento.');
+            }
+        });
+    });
+
+
+
+</script>
+
