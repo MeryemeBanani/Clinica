@@ -20,11 +20,12 @@
     @Html.HiddenFor(model => model.MicroChip)
     @Html.HiddenFor(model => model.Animale.Smarrito)
 
-    <div class="form-group">
-        <div>@Html.LabelFor(model => model.DataVisita)</div>
-        @Html.TextBoxFor(model => model.DataVisita, "{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control", type = "datetime-local" })
-        @Html.ValidationMessageFor(model => model.DataVisita)
-    </div>
+<div class="form-group">
+    <div>@Html.LabelFor(model => model.DataVisita)</div>
+    @Html.TextBoxFor(model => model.DataVisita, "{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control", type = "datetime-local" })
+    @Html.ValidationMessageFor(model => model.DataVisita)
+</div>
+
 
     <div class="form-group">
         <div>@Html.LabelFor(model => model.TipoVisita)</div>

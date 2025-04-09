@@ -32,8 +32,10 @@ namespace Clinica.Controllers
             {
 
                 var utente = db.Utenti.FirstOrDefault(u => u.UtenteID == user.UtenteID);
+                // sotto posso usare la versione hashtata della password per maggiore sicurezza, per ora visto che  non c'è il campo registrazione utente uso le password in chiaro nel db e anche qui (COSA DA NON FARE!)
+                //string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password); questa è la riga di codice per salvare le password hashtate e nel controllo sarebbe Crypto.VerifyHashedPassword(utente.Password, user.Password)
 
-                if (utente != null && user.Password == utente.Password)
+                if (utente != null && utente.Password== user.Password)
                 {
                     FormsAuthentication.SetAuthCookie(utente.UtenteID, false);  // Crea il cookie di autenticazione
                     Response.Cookies["Ruolo"].Value = utente.Ruolo;
@@ -69,6 +71,12 @@ namespace Clinica.Controllers
         [HttpPost]
         public ActionResult Cronistoria(string ID)
         {
+            if (string.IsNullOrWhiteSpace(ID))
+            {
+                TempData["Messaggio"] = "ID non valido.";
+                return RedirectToAction("Index");
+            }
+
 
             try
             {
@@ -103,54 +111,79 @@ namespace Clinica.Controllers
         {
             return View();
         }
+
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken] // Per protezione CSRF
         public ActionResult RegistraAnimale(Animale animale)
         {
-
             try
             {
                 if (ModelState.IsValid)
                 {
-
                     if (animale.file != null && animale.file.ContentLength > 0)
                     {
-                        string fileExt = Path.GetExtension(animale.file.FileName);
-                        string fileNameUnique = $"{DateTime.Now.Ticks}{fileExt}";
-                        string PathFile = Path.Combine(Server.MapPath("~/Content/imgUpload"), fileNameUnique);
-                        animale.file.SaveAs(PathFile);
-                        animale.PathFile = PathFile;
-                        animale.NameFile = fileNameUnique;
-                    }
+                        try
+                        {
+                            string uploadFolder = Server.MapPath("~/Content/imgUpload");
 
+                            // Assicura che la cartella esista
+                            if (!Directory.Exists(uploadFolder))
+                            {
+                                Directory.CreateDirectory(uploadFolder);
+                            }
+
+                            string fileExt = Path.GetExtension(animale.file.FileName);
+                            string fileNameUnique = $"{DateTime.Now.Ticks}{fileExt}";
+                            string savedFilePath = Path.Combine(uploadFolder, fileNameUnique);
+
+                            using (var fileStream = System.IO.File.Create(savedFilePath))
+                            {
+                                animale.file.InputStream.CopyTo(fileStream);
+                            }
+
+                            animale.PathFile = "/Content/imgUpload/" + fileNameUnique; // Path relativo per visualizzazione
+                            animale.NameFile = fileNameUnique;
+                        }
+                        catch (Exception ex)
+                        {
+                            TempData["ErroreFile"] = "Errore durante il salvataggio del file: " + ex.Message;
+                            return View(animale);
+                        }
+                    }
 
                     animale.DataRegistrazione = DateTime.Now;
 
-
                     db.Animali.Add(animale);
-                    db.SaveChanges();
+                    db.SaveChanges(); // Salvataggio nel database
 
-
+                    TempData["AggiuntaAnimale"] = "Animale aggiunto con successo!";
                     return RedirectToAction("Index");
                 }
-
+                else
+                {
+                    TempData["ErroreDB"] = "Dati non validi. Controlla i campi.";
+                    return View(animale);
+                }
             }
             catch (Exception ex)
             {
-                TempData["ErroreDB"] = "Errore inserimento nel database" + ex.Message;
+                TempData["ErroreDB"] = "Errore inserimento nel database: " + ex.Message;
+                if (ex.InnerException != null)
+                {
+                    TempData["ErroreDB"] += " Dettagli: " + ex.InnerException.Message;
+                }
+                return View(animale);
             }
-
-
-            return View(animale);
         }
+
 
         [Authorize]
 
         [HttpGet]
         public ActionResult AggiungiVisita(string id) //passo l'id dell'animale
         {
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrWhiteSpace(id))
             {
                 TempData["MessaggioAdd"] = "Codice microchip non valido!";
                 return RedirectToAction("Index");
@@ -175,7 +208,9 @@ namespace Clinica.Controllers
                 Colore = animale.Colore,
                 DataNascita = animale.DataNascita,
                 MicroChip = animale.MicroChip,
-                Smarrito = animale.Smarrito
+                Smarrito = animale.Smarrito,
+                DataVisita = DateTime.Now //verrà poi modificato dall'utente, metto questa riga solo per far partire l'anno dal 2025 e non dal 0001
+
 
             };
 
@@ -206,49 +241,80 @@ namespace Clinica.Controllers
         [Authorize]
 
         [HttpGet]
-        public ActionResult GetRicoveriAttivi()
+
+        public JsonResult GetRicoveriAttivi()
         {
-            var ricoveriAttivi = db.Visite.Where(v => v.Necessita_Ricovero && v.Smarrito).Select(v => new
-            {
-                v.ID,
-                v.AnimaleID,
-                NomeAnimale = v.Animale.Nome,
-                v.DataVisita, // lasciamo la data senza formattarla qui
-                v.TipoVisita,
-                v.Necessita_Ricovero
-            }).ToList().Select(v => new
-            {
-                v.ID,
-                v.AnimaleID,
-                v.NomeAnimale,
-                DataVisita = v.DataVisita.ToString("dd-MM-yyyy"),
-                v.TipoVisita,
-                v.Necessita_Ricovero
-            }).ToList();
-
-
+            
+            var ricoveriAttivi = db.Visite
+                .Where(v => v.Necessita_Ricovero)
+                .Select(v => new
+                {
+                    v.ID,
+                    v.AnimaleID,
+                    NomeAnimale = v.Animale.Nome,
+                    DataVisita = v.DataVisita, // Recupera la data senza formattarla
+                    v.TipoVisita,
+                    v.Necessita_Ricovero
+                })
+                .ToList() // Esegui la query in memoria
+                .Select(v => new
+                {
+                    v.ID,
+                    v.AnimaleID,
+                    v.NomeAnimale,
+                    DataVisita = v.DataVisita.ToString("yyyy-MM-dd"), // Formatta la data dopo che è stata recuperata
+                    v.TipoVisita,
+                    v.Necessita_Ricovero
+                })
+                .ToList();
 
             return Json(ricoveriAttivi, JsonRequestBehavior.AllowGet);
         }
 
+
+
+
+
+
         [Authorize]
-
         [HttpPost]
-
         public ActionResult AggiornaRicovero(int id, bool necessitaRicovero)
         {
-
             var visita = db.Visite.FirstOrDefault(v => v.ID == id);  //prendo la visita dal db con lo stesso id
             if (visita != null)
             {
                 visita.Necessita_Ricovero = necessitaRicovero;
                 db.SaveChanges(); //aggiorno il db con la nuova necessità
-                return Json(new { success = true });
+
+                // Recupera i ricoveri attivi aggiornati
+                var ricoveriAttivi = db.Visite.Where(v => v.Necessita_Ricovero && v.Smarrito)
+                                              .Select(v => new
+                                              {
+                                                  v.ID,
+                                                  v.AnimaleID,
+                                                  NomeAnimale = v.Animale.Nome,
+                                                  v.DataVisita,
+                                                  v.TipoVisita,
+                                                  v.Necessita_Ricovero
+                                              })
+                                              .ToList()
+                                              .Select(v => new
+                                              {
+                                                  v.ID,
+                                                  v.AnimaleID,
+                                                  v.NomeAnimale,
+                                                  DataVisita = v.DataVisita.ToString("dd-MM-yyyy"),
+                                                  v.TipoVisita,
+                                                  v.Necessita_Ricovero
+                                              })
+                                              .ToList();
+
+                return Json(new { success = true, ricoveriAttivi = ricoveriAttivi });
             }
+
             return Json(new { success = false });
-
-
         }
+
 
 
 
@@ -262,6 +328,11 @@ namespace Clinica.Controllers
         [HttpGet]
         public JsonResult VerificaRicovero(string microchip)
         {
+            if (string.IsNullOrWhiteSpace(microchip))
+            {
+                return Json(new { isRicoverato = false, messaggio = "Microchip mancante o non valido." }, JsonRequestBehavior.AllowGet);
+            }
+
 
             var visita = db.Visite.Where(v => v.AnimaleID == microchip && v.Necessita_Ricovero == true).Select(v => new
             {
@@ -310,8 +381,13 @@ namespace Clinica.Controllers
 
         public ActionResult ListaVisiteDaMicroChip(string microchip)
         {
-           
-                var visite = db.Visite.Where(v => v.AnimaleID == microchip).Select(v => new
+            if (string.IsNullOrWhiteSpace(microchip))
+            {
+                return Json(new { CiSonoVisite = false, messaggio = "Microchip mancante o non valido." }, JsonRequestBehavior.AllowGet);
+            }
+
+
+            var visite = db.Visite.Where(v => v.AnimaleID == microchip).Select(v => new
                 {
                     v.AnimaleID,
                     v.Nome,
@@ -342,8 +418,13 @@ namespace Clinica.Controllers
         [HttpGet]
         public ActionResult ListaAnimaliDaTipologia(string tipologia)
         {
-                {
-                    var animali = db.Animali.Where(a => db.Visite.Any(v => v.AnimaleID == a.ID && v.Necessita_Ricovero && a.Tipologia == tipologia)).Select(a => new
+            if (string.IsNullOrWhiteSpace(tipologia))
+            {
+                return Json(new { CiSonoAnimali = false, messaggio = "Tipologia non specificata." }, JsonRequestBehavior.AllowGet);
+            }
+
+            {
+                var animali = db.Animali.Where(a => db.Visite.Any(v => v.AnimaleID == a.ID && v.Necessita_Ricovero && a.Tipologia == tipologia)).Select(a => new
                     {
                         a.ID,
                         a.Nome,

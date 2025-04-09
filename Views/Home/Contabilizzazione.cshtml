@@ -4,71 +4,87 @@
 
 <h2>Ricoveri animali randagi</h2>
 
-
-<button id="CaricaRicoveri" class="btn btn-primary">Mostra i ricoveri </button>
-
+<button id="CaricaRicoveri" class="btn btn-primary">Mostra i ricoveri</button>
 
 <table id="tabellaRicoveri" class="table">
     <thead>
         <tr>
             <th>ID Ricovero</th>
             <th>Nome Animale</th>
-            <th>Id Animale</th>
+            <th>ID Animale</th>
             <th>Data Visita</th>
             <th>Tipo Visita</th>
             <th>Stato Ricovero</th>
         </tr>
     </thead>
     <tbody>
-       
+        <!-- Dati della tabella verranno popolati dinamicamente -->
     </tbody>
 </table>
 
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script>
-    $(document).ready(function () {
-        
-        $("#CaricaRicoveri").click(function () {
-            $.ajax({
-                url: '@Url.Action("GetRicoveriAttivi", "Home")', 
-                type: 'GET',
-                success: function (data) {
-                    
-                    $('#tabellaRicoveri tbody').empty();
 
-                   
-                    if (data.length > 0) {
-                       
-                        data.forEach(function (ricovero) {
+
+<script>
+    let ricoveriVisibili = false; // Stato iniziale: tabella nascosta
+
+    $(document).ready(function () {
+        $("#CaricaRicoveri").click(function () {
+            if (!ricoveriVisibili) {
+                // Carica i dati solo se la tabella è vuota
+                $.ajax({
+                    url: '@Url.Action("GetRicoveriAttivi", "Home")',
+                    type: 'GET',
+                    success: function (data) {
+                        $('#tabellaRicoveri tbody').empty();
+
+                        if (data.length > 0) {
+                            data.forEach(function (ricovero) {
+                                var dataVisitaFormattata = formatDate(ricovero.DataVisita);
+
+                                $('#tabellaRicoveri tbody').append(`
+                                    <tr>
+                                        <td>${ricovero.ID}</td>
+                                        <td>${ricovero.NomeAnimale}</td>
+                                        <td>${ricovero.AnimaleID}</td>
+                                        <td>${dataVisitaFormattata}</td>
+                                        <td>${ricovero.TipoVisita}</td>
+                                        <td>${ricovero.Necessita_Ricovero ? 'Sì' : 'No'}</td>
+                                    </tr>
+                                `);
+                            });
+                        } else {
                             $('#tabellaRicoveri tbody').append(`
                                 <tr>
-                                    <td>${ricovero.ID}</td>
-                                    <td>${ricovero.NomeAnimale}</td>
-                                    <td>${ricovero.AnimaleID}</td>
-                                    <td>${ricovero.DataVisita}</td>
-                                    <td>${ricovero.TipoVisita}</td>
-                                    <td>${ricovero.Necessita_Ricovero ? 'Sì' : 'No'}</td>
+                                    <td colspan="6" class="text-center">Nessun ricovero attivo trovato</td>
                                 </tr>
                             `);
-                        });
-                    } else {
-                        
-                        $('#tabellaRicoveri tbody').append(`
-                            <tr>
-                                <td colspan="5" class="text-center">Nessun ricovero attivo trovato</td>
-                            </tr>
-                        `);
+                        }
+
+                        ricoveriVisibili = true;
+                        $("#CaricaRicoveri").text("Nascondi i ricoveri");
+                    },
+                    error: function () {
+                        alert("Si è verificato un errore durante il caricamento dei ricoveri attivi.");
                     }
-                },
-                error: function (xhr, status, error) {
-                    alert("Si è verificato un errore durante il caricamento dei ricoveri attivi.");
-                }
-            });
+                });
+            } else {
+                // Svuota la tabella se è già visibile
+                $('#tabellaRicoveri tbody').empty();
+                ricoveriVisibili = false;
+                $("#CaricaRicoveri").text("Mostra i ricoveri");
+            }
         });
     });
+
+    function formatDate(dateString) {
+        if (!dateString) return "Data non disponibile";
+        var date = new Date(dateString);
+        if (isNaN(date.getTime())) return "Data non valida";
+        var day = ("0" + date.getDate()).slice(-2);
+        var month = ("0" + (date.getMonth() + 1)).slice(-2);
+        var year = date.getFullYear();
+        return day + "/" + month + "/" + year;
+    }
 </script>
-
-
-
