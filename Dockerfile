@@ -1,12 +1,12 @@
 # Usa un'immagine di base con .NET SDK
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS base  # Usa l'immagine SDK completa (include più strumenti)
 WORKDIR /app
 EXPOSE 80
 
-# Usa un'immagine di base per costruire il progetto
+# Usa l'immagine SDK per costruire il progetto
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["Clinica.csproj", "./"]  # Copia il .csproj dalla root
+COPY ["Clinica.csproj", "./"]
 RUN dotnet restore "Clinica.csproj"
 COPY . .
 WORKDIR "/src"
@@ -20,4 +20,5 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Clinica.dll"]
+
 
