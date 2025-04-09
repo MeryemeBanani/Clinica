@@ -66,10 +66,12 @@
 
 
     <div class="form-group">
-        <div>@Html.LabelFor(model => model.file)</div>
+
+        <div>@Html.LabelFor(model => model.file, "Carica Foto")</div>
         <input type="file" name="file" class="form-control" />
         @Html.ValidationMessageFor(model => model.file)
     </div>
+
 
 
     <button type="submit" class="btn btn-primary">Salva</button>
@@ -78,5 +80,15 @@
 
 @if (TempData["ErroreDB"] != null)
 {
-    @TempData["ErroreDB"]
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErroreDB"]
+    </div>
 }
+
+@if (TempData["AggiuntaAnimale"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["AggiuntaAnimale"]
+    </div>
+}
+

@@ -128,6 +128,10 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\ApplicationDbContext.cs" />
+    <Compile Include="Migrations\202504082053260_NomeMigrazione.cs" />
+    <Compile Include="Migrations\202504082053260_NomeMigrazione.Designer.cs">
+      <DependentUpon>202504082053260_NomeMigrazione.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\CustomRoleProvider.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
@@ -262,6 +266,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202412182004224_ModificaTabelle1.resx">
       <DependentUpon>202412182004224_ModificaTabelle1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504082053260_NomeMigrazione.resx">
+      <DependentUpon>202504082053260_NomeMigrazione.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
