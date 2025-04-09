@@ -1,5 +1,5 @@
 # Usa un'immagine di base con .NET SDK
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS base  # Usa l'immagine SDK completa (include più strumenti)
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS base  
 WORKDIR /app
 EXPOSE 80
 
